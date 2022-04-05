@@ -1,11 +1,13 @@
 class Plate {
-    constructor(ctx, gameSize, posX, posY, width, heigth) {
+    constructor(ctx, gameSize, posX, posY, width, height) {
         this.ctx = ctx
         this.gameSize = gameSize
         this.platePos = { x: posX, y: posY }
-        this.plateSize = { w: width, h: heigth }
+        this.plateSize = { w: width, h: height }
 
         this.imageInstance = undefined
+
+        this.lives = 3
 
         this.init()
     }
@@ -22,13 +24,13 @@ class Plate {
 
     moveRight() {
         if (this.platePos.x + this.plateSize.w < this.gameSize.w) {
-            this.platePos.x += 10
+            this.platePos.x += 15
         }
     }
 
     moveLeft() {
         if (this.platePos.x >= 0) {
-            this.platePos.x -= 10
+            this.platePos.x -= 15
         }
     }
 
