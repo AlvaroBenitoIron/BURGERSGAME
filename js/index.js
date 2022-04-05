@@ -12,7 +12,7 @@ window.onload = () => {
 };
 
 const gameApp = {
-    name: 'Burguers game',
+    name: 'Burgers game',
     description: 'E-learning for coocking apprentice',
     version: '1.0.0',
     author: 'Alvaro y Guillermo',
@@ -24,6 +24,8 @@ const gameApp = {
     ingredients: [],
     allPiggish: [],
     framesIndex: 0,
+    timer: 30,
+    lives: [],
 
 
 
@@ -33,6 +35,7 @@ const gameApp = {
         this.ctx = this.canvasNode.getContext('2d')
         this.setDimensions()
         this.createPlate()
+        // this.createLife()
         this.setEventListeners()
         this.start()
     },
@@ -52,8 +55,17 @@ const gameApp = {
         this.plate.draw()
     },
 
+    // createLife() {
+    //     this.life = new Life(this.ctx, this.gameSize, this.gameSize.w / 2 - 10, 50, 50, 100)
+    // },
+
+    // drawLife() {
+    //     this.life.draw()
+    // },
+
     drawAll() {
         this.drawPlate()
+
 
 
         this.allPiggish.forEach(eachPiggish => eachPiggish.draw())
@@ -61,6 +73,8 @@ const gameApp = {
         this.ingredients.forEach(eachIngredient => eachIngredient.draw())
 
         this.drawOrder()
+        // this.drawLife()
+
 
 
     },
@@ -80,7 +94,7 @@ const gameApp = {
     start() {
         this.interval = setInterval(() => {
 
-            if (this.framesIndex >= 300 && this.framesIndex % 300 === 0) {
+            if (this.framesIndex >= 300 && this.framesIndex % 270 === 0) {
                 this.createPiggish()
             }
 
@@ -88,13 +102,14 @@ const gameApp = {
                 this.randomNumber()
             }
 
-
-
             this.clearAll()
             this.drawAll()
 
+            this.checkLives()
+
             this.checkIngredientCollision()
             this.checkPiggishCollisions() ? this.gameOver() : null
+            this.updateClock()
             this.victory()
 
             this.framesIndex++
@@ -161,19 +176,20 @@ const gameApp = {
         this.ctx.fillStyle = 'white'
         this.ctx.fillText('Order:', 20, 50)
         this.ctx.font = 'bold 15pt Menlo'
-        this.ctx.fillText(`${allBurguers[0].name}`, 20, 75)
+        this.ctx.fillText(`${allBurgers[0].name}`, 20, 75)
+
         this.ctx.font = 'bold 10pt Menlo'
         let place = 95
-        allBurguers[0].ingredients.forEach(eachIngredient => {
-            console.log(eachIngredient)
+        allBurgers[0].ingredients.forEach(eachIngredient => {
             this.ctx.fillText(`${eachIngredient}`, 20, place)
             place += 15
         })
+        this.ctx.font = 'bold 25pt Menlo'
+        this.ctx.fillStyle = 'white'
+        this.ctx.fillText(`${this.timer}`, 430, 45)
     },
 
-    // drawClock() {
-    // A VER COMO METEMOS ESTO
-    // },
+
 
     checkPiggishCollisions() {
         let piggishFound = false
@@ -202,9 +218,20 @@ const gameApp = {
     },
 
     gameOver() {
-        clearInterval(this.interval)
         this.drawGameOver()
+        clearInterval(this.interval)
 
+    },
+
+    updateClock() {
+
+        if (this.timer === 0) {
+            this.gameOver()
+        } else {
+            if (this.framesIndex % 33 === 0) {
+                this.timer -= 1;
+            }
+        }
     },
 
     checkIngredientCollision() {
@@ -230,17 +257,17 @@ const gameApp = {
 
     checkIngredient(eachIngredient) {
 
-        if (eachIngredient === allBurguers[0].ingredients[0]) {
+        if (eachIngredient === allBurgers[0].ingredients[0]) {
             // AUMENTAR IMAGEN DEL PLATO
-            allBurguers[0].ingredients.shift()
-        } if (eachIngredient !== allBurguers[0].ingredients[0]) {
+            allBurgers[0].ingredients.shift()
+        } else {
             this.plate.lives -= 1
 
         }
     },
 
     victory() {
-        if (allBurguers[0].ingredients.length === 0) {
+        if (allBurgers[0].ingredients.length === 0) {
             clearInterval(this.interval)
             this.drawVictory()
         }
@@ -251,9 +278,20 @@ const gameApp = {
         this.ctx.fillRect(this.gameSize.w / 2 - 200, this.gameSize.h / 2 - 50, 400, 100)
         this.ctx.font = 'bold 25pt Menlo'
         this.ctx.fillStyle = 'black'
-        this.ctx.fillText('BURGUER READY!', 100, 315)
-    }
+        this.ctx.fillText('BURGER READY!', 100, 315)
+    },
 
+    checkLives() {
+        if (this.plate.lives < 0) {
+            this.gameOver()
+        }
+    },
+
+    drawLive() {
+        if (this.plate.lives === 3) {
+
+        }
+    },
 
 }
 
