@@ -1,6 +1,6 @@
 class Ingredients {
     constructor(ctx, gameSize, posX, posY, speed) {
-        this.ingredientSize = { w: 100, h: 30 }
+        this.ingredientSize = { w: 100, h: 100 }
         this.ctx = ctx
         this.gameSize = gameSize
         this.ingredientPos = { x: posX, y: posY }
@@ -28,7 +28,7 @@ class Bread1 extends Ingredients {
 
     init() {
         this.imageInstance = new Image()
-        this.imageInstance.src = 'images/bread1.webp'
+        this.imageInstance.src = 'images/BottomBread.png'
     }
 
     draw() {
@@ -53,7 +53,7 @@ class Meat extends Ingredients {
 
     init() {
         this.imageInstance = new Image()
-        this.imageInstance.src = 'images/meat.jpg'
+        this.imageInstance.src = 'images/Meat.png'
     }
 
     draw() {
@@ -79,7 +79,7 @@ class Cheese extends Ingredients {
 
     init() {
         this.imageInstance = new Image()
-        this.imageInstance.src = 'images/cheese.jpeg'
+        this.imageInstance.src = 'images/Cheese.png'
     }
 
     draw() {
@@ -104,7 +104,7 @@ class Bread2 extends Ingredients {
 
     init() {
         this.imageInstance = new Image()
-        this.imageInstance.src = 'images/bread2.jpg'
+        this.imageInstance.src = 'images/TopBread.png'
     }
 
     draw() {

@@ -4,11 +4,11 @@ const allBurgers = [
         ingredients: ['Bottom bread', 'Meat', 'Cheese', 'Top bread']
 
     },
-    //     {
-    //         name: 'cbo',
-    //         ingredients: ['bread1', 'meat', 'cheese', 'bacon', 'onion', 'bread2']
-    //     },
-    //     {
+    {
+        name: 'cbo',
+        ingredients: ['bread1', 'meat', 'cheese', 'bacon', 'onion', 'bread2']
+    },
+    //{
     //         name: 'fullburguer',
     //         ingredients: ['bread1', 'meat', 'cheese', 'bacon', 'onion', 'lettuce', 'tomatoe', 'bread2']
     //     },

@@ -1,6 +1,10 @@
 window.onload = () => {
     document.getElementById('start-button').onclick = () => {
         startGame();
+        this.music = new Audio("music/Smiley-island-short.mp3")
+        this.music.play()
+        this.music.loop = true
+        this.music.volume = 1
     };
 
     function startGame() {
@@ -15,7 +19,7 @@ const gameApp = {
     name: 'Burgers game',
     description: 'E-learning for coocking apprentice',
     version: '1.0.0',
-    author: 'Alvaro y Guillermo',
+    author: 'Álvaro y Guillermo',
     license: undefined,
     canvasNode: undefined,
     ctx: undefined,
@@ -24,8 +28,9 @@ const gameApp = {
     ingredients: [],
     allPiggish: [],
     framesIndex: 0,
-    timer: 30,
+    timer: 45,
     lives: [],
+    // level: 0,
 
 
 
@@ -33,11 +38,16 @@ const gameApp = {
     init(canvas) {
         this.canvasNode = document.querySelector(`#${canvas}`)
         this.ctx = this.canvasNode.getContext('2d')
+        this.losingImageInstance = new Image()
+        this.losingImageInstance.src = 'images/GETOUT.png'
+        this.winningImageInstance = new Image()
+        this.winningImageInstance.src = 'images/BURGERREADY.png'
         this.setDimensions()
         this.createPlate()
-        // this.createLife()
+        this.createLife()
         this.setEventListeners()
         this.start()
+
     },
 
     setDimensions() {
@@ -48,24 +58,34 @@ const gameApp = {
     },
 
     createPlate() {
-        this.plate = new Plate(this.ctx, this.gameSize, this.gameSize.w / 2 - 75, this.gameSize.h - 50, 150, 30)
+        this.plate = new Plate(this.ctx, this.gameSize, this.gameSize.w / 2 - 75, this.gameSize.h - 60, 150, 30)
     },
 
     drawPlate() {
         this.plate.draw()
     },
 
-    // createLife() {
-    //     this.life = new Life(this.ctx, this.gameSize, this.gameSize.w / 2 - 10, 50, 50, 100)
-    // },
+    createLife() {
+        let lifePlace = this.gameSize.w / 2
+        for (let i = 0; i < this.plate.lives; i++) {
+            this.lives.push(new Life(this.ctx, this.gameSize, lifePlace - 40, 20, 100, 50))
+            lifePlace += 20
+        }
 
-    // drawLife() {
-    //     this.life.draw()
-    // },
+
+
+    },
+
+    drawLives() {
+        this.lives.forEach(eachLives => eachLives.draw())
+
+    },
+
 
     drawAll() {
         this.drawPlate()
 
+        this.drawLives()
 
 
         this.allPiggish.forEach(eachPiggish => eachPiggish.draw())
@@ -73,7 +93,6 @@ const gameApp = {
         this.ingredients.forEach(eachIngredient => eachIngredient.draw())
 
         this.drawOrder()
-        // this.drawLife()
 
 
 
@@ -94,7 +113,7 @@ const gameApp = {
     start() {
         this.interval = setInterval(() => {
 
-            if (this.framesIndex >= 300 && this.framesIndex % 270 === 0) {
+            if (this.framesIndex >= 260 && this.framesIndex % 240 === 0) {
                 this.createPiggish()
             }
 
@@ -114,6 +133,11 @@ const gameApp = {
 
             this.framesIndex++
         }, 30)
+
+        // this.music = new Audio("./music/Smiley-island-short.mp3")
+        // music.play()
+
+
     },
 
     createPiggish() {
@@ -161,6 +185,8 @@ const gameApp = {
 
     },
 
+
+
     clearIngredients() {
         this.ingredients.forEach(eachIngredient => {
             if (eachIngredient.ingredientPos.y > 700) {
@@ -172,19 +198,19 @@ const gameApp = {
     drawOrder() {
         this.ctx.fillStyle = 'rgba(0, 0, 0, 0.5)'
         this.ctx.fillRect(10, 20, 150, 190)
-        this.ctx.font = 'bold 20pt Menlo'
+        this.ctx.font = 'bold 20pt Barlow'
         this.ctx.fillStyle = 'white'
         this.ctx.fillText('Order:', 20, 50)
-        this.ctx.font = 'bold 15pt Menlo'
+        this.ctx.font = 'bold 15pt Barlow'
         this.ctx.fillText(`${allBurgers[0].name}`, 20, 75)
 
-        this.ctx.font = 'bold 10pt Menlo'
+        this.ctx.font = 'bold 10pt Barlow'
         let place = 95
         allBurgers[0].ingredients.forEach(eachIngredient => {
             this.ctx.fillText(`${eachIngredient}`, 20, place)
             place += 15
         })
-        this.ctx.font = 'bold 25pt Menlo'
+        this.ctx.font = 'bold 25pt Barlow'
         this.ctx.fillStyle = 'white'
         this.ctx.fillText(`${this.timer}`, 430, 45)
     },
@@ -209,16 +235,13 @@ const gameApp = {
     },
 
     drawGameOver() {
-        this.ctx.fillStyle = 'rgba (0, 0, 0, 0.5)'
-        this.ctx.fillRect(this.gameSize.w / 2 - 200, this.gameSize.h / 2 - 50, 400, 100)
-        this.ctx.font = 'bold 25pt Menlo'
-        this.ctx.fillStyle = 'black'
-        this.ctx.fillText('YOU ARE FIRED!!!', 100, 315)
 
+        this.ctx.drawImage(this.losingImageInstance, 0, 0)
     },
 
     gameOver() {
         this.drawGameOver()
+        this.music.stop()
         clearInterval(this.interval)
 
     },
@@ -262,6 +285,7 @@ const gameApp = {
             allBurgers[0].ingredients.shift()
         } else {
             this.plate.lives -= 1
+            this.lives.shift()
 
         }
     },
@@ -270,15 +294,14 @@ const gameApp = {
         if (allBurgers[0].ingredients.length === 0) {
             clearInterval(this.interval)
             this.drawVictory()
+            this.music.stop()
+            // this.level += 1
+            // this.nextLevel()
         }
     },
 
     drawVictory() {
-        this.ctx.fillStyle = 'rgba (0, 0, 0, 0.5)'
-        this.ctx.fillRect(this.gameSize.w / 2 - 200, this.gameSize.h / 2 - 50, 400, 100)
-        this.ctx.font = 'bold 25pt Menlo'
-        this.ctx.fillStyle = 'black'
-        this.ctx.fillText('BURGER READY!', 100, 315)
+        this.ctx.drawImage(this.winningImageInstance, 0, 0)
     },
 
     checkLives() {
@@ -292,6 +315,12 @@ const gameApp = {
 
         }
     },
+
+    // nextLevel() {
+
+    // }
+
+
 
 }
 

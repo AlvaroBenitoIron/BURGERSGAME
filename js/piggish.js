@@ -3,7 +3,7 @@ class Piggish {
         this.ctx = ctx
         this.gameSize = gameSize
         this.piggishPos = { x: posX, y: posY }
-        this.piggishSize = { w: 60, h: 60 }
+        this.piggishSize = { w: 80, h: 100 }
         this.speed = speed
 
         this.imageInstance = undefined
@@ -14,7 +14,7 @@ class Piggish {
 
     init() {
         this.imageInstance = new Image()
-        this.imageInstance.src = 'images/piggish.png'
+        this.imageInstance.src = 'images/Pigg.png'
     }
 
     draw() {
