@@ -5,8 +5,8 @@ const allBurgers = [
 
     },
     {
-        name: 'cbo',
-        ingredients: ['bread1', 'meat', 'cheese', 'bacon', 'onion', 'bread2']
+        name: 'CBO',
+        ingredients: ['Bottom bread', 'Meat', 'Cheese', 'Bacon', 'Onion', 'Top bread']
     },
     //{
     //         name: 'fullburguer',

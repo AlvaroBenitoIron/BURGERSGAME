@@ -1,10 +1,6 @@
 window.onload = () => {
     document.getElementById('start-button').onclick = () => {
         startGame();
-        this.music = new Audio("music/Smiley-island-short.mp3")
-        this.music.play()
-        this.music.loop = true
-        this.music.volume = 1
     };
 
     function startGame() {
@@ -30,7 +26,13 @@ const gameApp = {
     framesIndex: 0,
     timer: 45,
     lives: [],
-    // level: 0,
+    music: undefined,
+    level: 0,
+    thingsFalling: true,
+    drawingVictoryImage: false,
+    isDone: false,
+    level2Passed: false,
+    isFinished: false,
 
 
 
@@ -42,6 +44,25 @@ const gameApp = {
         this.losingImageInstance.src = 'images/GETOUT.png'
         this.winningImageInstance = new Image()
         this.winningImageInstance.src = 'images/BURGERREADY.png'
+        this.burgerStartImageInstance = new Image
+        this.burgerStartImageInstance.src = 'images/burger-start.png'
+        this.meatImageInstance = new Image()
+        this.meatImageInstance.src = 'images/burger-meat.png'
+        this.cheeseMeatImageInstance = new Image()
+        this.cheeseMeatImageInstance.src = 'images/burger-cheese.png'
+        this.burgerEndImageInstance = new Image()
+        this.burgerEndImageInstance.src = 'images/burger-end.png'
+        this.burgerBaconImageInstance = new Image()
+        this.burgerBaconImageInstance.src = 'images/burger2-bacon.png'
+        this.burgerOnionImageInstance = new Image()
+        this.burgerOnionImageInstance.src = 'images/burger2-onion.png'
+        this.burgerEnd2ImageInstance = new Image()
+        this.burgerEnd2ImageInstance.src = 'images/burger2-end.png'
+        this.music = new Audio("music/Smiley-island-short.mp3")
+        this.music.play()
+        this.music.loop = true
+        this.music.volume = 1
+
         this.setDimensions()
         this.createPlate()
         this.createLife()
@@ -81,20 +102,44 @@ const gameApp = {
 
     },
 
+    drawBurger() {
+
+        if (allBurgers[0].ingredients.length === 3) {
+            this.ctx.drawImage(this.burgerStartImageInstance, 3, 270, 80, 80)
+        }
+
+        if (allBurgers[0].ingredients.length === 2) {
+            this.ctx.drawImage(this.meatImageInstance, 3, 270, 80, 80)
+        }
+
+        if (allBurgers[0].ingredients.length === 1) {
+            this.ctx.drawImage(this.cheeseMeatImageInstance, 3, 270, 80, 80)
+        }
+
+        if (allBurgers[0].ingredients.length === 0) {
+            this.ctx.drawImage(this.burgerEndImageInstance, 3, 270, 80, 80)
+        }
+
+
+    },
+
 
     drawAll() {
         this.drawPlate()
 
         this.drawLives()
 
-
         this.allPiggish.forEach(eachPiggish => eachPiggish.draw())
 
         this.ingredients.forEach(eachIngredient => eachIngredient.draw())
 
+        if (this.level === 0) {
+            this.drawBurger()
+        } else {
+            this.drawBurger2()
+        }
+
         this.drawOrder()
-
-
 
     },
 
@@ -111,8 +156,9 @@ const gameApp = {
     },
 
     start() {
-        this.interval = setInterval(() => {
 
+
+        this.interval = setInterval(() => {
             if (this.framesIndex >= 260 && this.framesIndex % 240 === 0) {
                 this.createPiggish()
             }
@@ -120,28 +166,25 @@ const gameApp = {
             if (this.framesIndex >= 5 && this.framesIndex % 50 === 0) {
                 this.randomNumber()
             }
-
             this.clearAll()
             this.drawAll()
-
             this.checkLives()
-
             this.checkIngredientCollision()
             this.checkPiggishCollisions() ? this.gameOver() : null
             this.updateClock()
             this.victory()
-
+            this.end()
             this.framesIndex++
+
         }, 30)
-
-        // this.music = new Audio("./music/Smiley-island-short.mp3")
-        // music.play()
-
 
     },
 
+
     createPiggish() {
-        this.allPiggish.push(new Piggish(this.ctx, this.gameSize, Math.random() * this.gameSize.w * .75, 0, 5))
+        if (this.thingsFalling) {
+            this.allPiggish.push(new Piggish(this.ctx, this.gameSize, Math.random() * this.gameSize.w * .75, 0, 5))
+        }
     },
 
     clearAll() {
@@ -161,26 +204,42 @@ const gameApp = {
     },
 
     randomNumber() {
-        let a = 1
-        let b = 5
-        let random = Math.floor(Math.random() * (b - a) + parseInt(a));
-        this.createIngredient(random)
-        return random
+        if (this.level === 0) {
+            let a = 1
+            let b = 5
+            let random = Math.floor(Math.random() * (b - a) + parseInt(a));
+            this.createIngredient(random)
+            return random
+        } else {
+            let a = 1
+            let b = 7
+            let random = Math.floor(Math.random() * (b - a) + parseInt(a));
+            this.createIngredient(random)
+            return random
+        }
     },
 
     createIngredient(random) {
-        if (random === 1) {
-            this.ingredients.push(new Bread1(this.ctx, this.gameSize, Math.random() * this.gameSize.w * .75, 0, 5))
-        }
-        if (random === 2) {
-            this.ingredients.push(new Meat(this.ctx, this.gameSize, Math.random() * this.gameSize.w * .75, 0, 5))
-        }
+        if (this.thingsFalling) {
+            if (random === 1) {
+                this.ingredients.push(new Bread1(this.ctx, this.gameSize, Math.random() * this.gameSize.w * .75, 0, 5))
+            }
+            if (random === 2) {
+                this.ingredients.push(new Meat(this.ctx, this.gameSize, Math.random() * this.gameSize.w * .75, 0, 5))
+            }
 
-        if (random === 3) {
-            this.ingredients.push(new Cheese(this.ctx, this.gameSize, Math.random() * this.gameSize.w * .75, 0, 5))
-        }
-        if (random === 4) {
-            this.ingredients.push(new Bread2(this.ctx, this.gameSize, Math.random() * this.gameSize.w * .75, 0, 5))
+            if (random === 3) {
+                this.ingredients.push(new Cheese(this.ctx, this.gameSize, Math.random() * this.gameSize.w * .75, 0, 5))
+            }
+            if (random === 4) {
+                this.ingredients.push(new Bread2(this.ctx, this.gameSize, Math.random() * this.gameSize.w * .75, 0, 5))
+            }
+            if (random === 5) {
+                this.ingredients.push(new Bacon(this.ctx, this.gameSize, Math.random() * this.gameSize.w * .75, 0, 5))
+            }
+            if (random === 6) {
+                this.ingredients.push(new Onion(this.ctx, this.gameSize, Math.random() * this.gameSize.w * .75, 0, 5))
+            }
         }
 
     },
@@ -202,17 +261,31 @@ const gameApp = {
         this.ctx.fillStyle = 'white'
         this.ctx.fillText('Order:', 20, 50)
         this.ctx.font = 'bold 15pt Barlow'
-        this.ctx.fillText(`${allBurgers[0].name}`, 20, 75)
+        if (this.level === 0) {
+            this.ctx.fillText(`${allBurgers[0].name}`, 20, 75)
 
-        this.ctx.font = 'bold 10pt Barlow'
-        let place = 95
-        allBurgers[0].ingredients.forEach(eachIngredient => {
-            this.ctx.fillText(`${eachIngredient}`, 20, place)
-            place += 15
-        })
-        this.ctx.font = 'bold 25pt Barlow'
-        this.ctx.fillStyle = 'white'
-        this.ctx.fillText(`${this.timer}`, 430, 45)
+            this.ctx.font = 'bold 10pt Barlow'
+            let place = 95
+            allBurgers[0].ingredients.forEach(eachIngredient => {
+                this.ctx.fillText(`${eachIngredient}`, 20, place)
+                place += 15
+            })
+            this.ctx.font = 'bold 30pt Barlow'
+            this.ctx.fillStyle = 'white'
+            this.ctx.fillText(`${this.timer}`, 430, 60)
+        } else {
+            this.ctx.fillText(`${allBurgers[1].name}`, 20, 75)
+
+            this.ctx.font = 'bold 10pt Barlow'
+            let place = 95
+            allBurgers[1].ingredients.forEach(eachIngredient => {
+                this.ctx.fillText(`${eachIngredient}`, 20, place)
+                place += 15
+            })
+            this.ctx.font = 'bold 30pt Barlow'
+            this.ctx.fillStyle = 'white'
+            this.ctx.fillText(`${this.timer}`, 430, 60)
+        }
     },
 
 
@@ -241,7 +314,8 @@ const gameApp = {
 
     gameOver() {
         this.drawGameOver()
-        this.music.stop()
+        this.music.pause()
+
         clearInterval(this.interval)
 
     },
@@ -280,28 +354,71 @@ const gameApp = {
 
     checkIngredient(eachIngredient) {
 
-        if (eachIngredient === allBurgers[0].ingredients[0]) {
-            // AUMENTAR IMAGEN DEL PLATO
-            allBurgers[0].ingredients.shift()
-        } else {
-            this.plate.lives -= 1
-            this.lives.shift()
+        if (this.level === 0) {
+            if (eachIngredient === allBurgers[0].ingredients[0]) {
+                allBurgers[0].ingredients.shift()
+            } else {
+                this.plate.lives -= 1
+                this.lives.shift()
 
+            }
+        } else {
+            console.log(eachIngredient)
+            console.log(allBurgers[1].ingredients[0])
+            if (eachIngredient === allBurgers[1].ingredients[0]) {
+                console.log(this.ingredients)
+                allBurgers[1].ingredients.shift()
+                if (allBurgers[1].ingredients.length === 0) {
+                    this.isFinished = true
+                }
+            } else {
+                this.plate.lives -= 1
+                this.lives.shift()
+            }
         }
     },
 
     victory() {
-        if (allBurgers[0].ingredients.length === 0) {
-            clearInterval(this.interval)
-            this.drawVictory()
-            this.music.stop()
-            // this.level += 1
-            // this.nextLevel()
+        if (this.isDone === false) {
+            if (allBurgers[0].ingredients.length === 0) {
+                this.drawingVictoryImage = true
+                this.drawVictory()
+                this.level = 1
+
+                this.music.pause()
+            }
+
         }
     },
 
     drawVictory() {
-        this.ctx.drawImage(this.winningImageInstance, 0, 0)
+        if (this.drawingVictoryImage === true) {
+            this.cleanArrays()
+            this.startNewLevel()
+            this.thingsFalling = false
+            this.timer = 120
+
+            // this.ctx.fillRect(100, 100, 100, 100)
+
+
+            this.ctx.drawImage(this.winningImageInstance, 0, 0)
+            this.ctx.drawImage(this.burgerEndImageInstance, 235, 320, 230, 230)
+
+            if (this.level === 1) {
+                // clearInterval(this.interval)
+                // this.ctx.drawImage(this.burgerEndImageInstance, 235, 320, 230, 230)
+
+            }
+        }
+
+
+
+    },
+
+    cleanArrays() {
+        this.ingredients = []
+        this.allPiggish = []
+        this.lives = []
     },
 
     checkLives() {
@@ -316,12 +433,67 @@ const gameApp = {
         }
     },
 
-    // nextLevel() {
+    startNewLevel() {
+        if (this.level === 1) {
+            document.querySelector("canvas").onclick = () => {
+                this.drawingVictoryImage = false
+                this.thingsFalling = true
+                this.plate.lives = 30
 
-    // }
+                this.createLife()
+                this.isDone = true
+                this.music.play()
+            }
+        }
+
+    },
+
+    drawBurger2() {
+
+        if (allBurgers[1].ingredients.length === 5) {
+            this.ctx.drawImage(this.burgerStartImageInstance, 3, 270, 80, 80)
+        }
+
+        if (allBurgers[1].ingredients.length === 4) {
+            this.ctx.drawImage(this.meatImageInstance, 3, 270, 80, 80)
+        }
+
+        if (allBurgers[1].ingredients.length === 3) {
+            this.ctx.drawImage(this.cheeseMeatImageInstance, 3, 270, 80, 80)
+        }
+
+        if (allBurgers[1].ingredients.length === 2) {
+            this.ctx.drawImage(this.burgerBaconImageInstance, 3, 270, 80, 80)
+        }
+
+        if (allBurgers[1].ingredients.length === 1) {
+            this.ctx.drawImage(this.burgerOnionImageInstance, 3, 270, 80, 80)
+        }
+
+
+        if (allBurgers[1].ingredients.length === 0) {
+            this.ctx.drawImage(this.burgerEnd2ImageInstance, 3, 270, 80, 80)
+        }
+
+
+    },
+
+    end() {
+        if (allBurgers[1].ingredients.length === 0 && this.isFinished === true) {
+            this.level2Passed = true
+            clearInterval(this.interval)
+            this.drawEnd()
+        }
+    },
+
+    drawEnd() {
+        this.drawingVictoryImage = true
+        this.ctx.drawImage(this.winningImageInstance, 0, 0)
+        this.ctx.drawImage(this.burgerEnd2ImageInstance, 235, 320, 230, 230)
+        this.music.pause()
+
+    }
 
 
 
 }
-
-
